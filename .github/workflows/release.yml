@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, matching package.json. Example: 0.1.0"
+        required: true
+        type: string
+      publish_marketplace:
+        description: "Publish to VS Code Marketplace using the VSCE_PAT secret"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release:
+    name: Package and release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate package version
+        shell: bash
+        run: |
+          ACTUAL_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$ACTUAL_VERSION" != "${{ inputs.version }}" ]; then
+            echo "package.json version is $ACTUAL_VERSION, expected ${{ inputs.version }}"
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Package VSIX
+        run: npx @vscode/vsce package --allow-missing-repository
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ inputs.version }}" "bug-report-builder-${{ inputs.version }}.vsix" \
+            --target "${{ github.sha }}" \
+            --title "v${{ inputs.version }}" \
+            --generate-notes
+
+      - name: Publish Marketplace
+        if: ${{ inputs.publish_marketplace }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx @vscode/vsce publish --packagePath "bug-report-builder-${{ inputs.version }}.vsix" -p "$VSCE_PAT"

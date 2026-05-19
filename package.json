@@ -1,0 +1,68 @@
+{
+  "name": "bug-report-builder",
+  "displayName": "Colin's Bug Report Builder",
+  "description": "Create GitHub-ready bug reports from VS Code diagnostics, selected code, and workspace context.",
+  "version": "0.1.0",
+  "publisher": "ColinGamez",
+  "license": "MIT",
+  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:bug-report-builder.create"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#180602",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ColinGamez/bug-report-builder.git"
+  },
+  "homepage": "https://github.com/ColinGamez/bug-report-builder#readme",
+  "bugs": {
+    "url": "https://github.com/ColinGamez/bug-report-builder/issues"
+  },
+  "scripts": {
+    "build": "node scripts/check-package.mjs"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "bug report",
+    "issue builder",
+    "github issue",
+    "diagnostics",
+    "markdown",
+    "workspace",
+    "developer tools",
+    "troubleshooting",
+    "bug template",
+    "vs code"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "bug-report-builder.create",
+        "title": "Create Bug Report",
+        "category": "Colin's Bug Report Builder"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "bug-report-builder.create",
+          "when": "editorTextFocus",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  }
+}

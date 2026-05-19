@@ -1,0 +1,6 @@
+.vscode/**
+.github/**
+scripts/**
+.gitignore
+package-lock.json
+*.vsix
